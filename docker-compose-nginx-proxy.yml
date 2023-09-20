@@ -41,6 +41,12 @@ services:
 volumes:
   conf:
   vhost:
+    # this will later allow you to use custom nginx conf files (if needed) for each vhost
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /opt/gitlab/nginx/vhost.d
   certs:
   acme:
   html:
