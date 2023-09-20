@@ -1,1 +1,2 @@
-# docker-self-hosted-gitlab-cicd-traefik
+This repo contains a collection of documented steps and configuration files for [self-hosting GitLab](https://docs.gitlab.com/ee/install/) on your Linux server _(currently RHEL)_ using Docker.
+It also includes [GitLab runners](https://docs.gitlab.com/runner/install/) configurations that enable automatic application deployment with [GitLab's CI/CD](https://docs.gitlab.com/ee/ci/), all containerized within Docker.
