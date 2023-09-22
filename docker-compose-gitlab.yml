@@ -9,7 +9,7 @@ services:
       LETSENCRYPT_HOST: gitlab.mydomain.com
       VIRTUAL_HOST: gitlab.mydomain.com
       VIRTUAL_PORT: 8929
-      GITLAB_HOME: /src/gitlab
+      GITLAB_HOME: /srv/gitlab
       GITLAB_OMNIBUS_CONFIG: |
         external_url 'http://gitlab.mydomain.com:8929'
         gitlab_rails['gitlab_shell_ssh_port'] = 2224
