@@ -6,7 +6,7 @@ services:
     container_name: gitlab-runner
     volumes:
       - /srv/gitlab-runner/config:/etc/gitlab-runner
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     restart: always
     networks:
       - gitlab
