@@ -40,8 +40,14 @@ services:
 
 volumes:
   conf:
+    # this will later allow you to use proxy-wide nginx configuration
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /opt/gitlab/nginx/conf.d
   vhost:
-    # this will later allow you to use custom nginx conf files (if needed) for each vhost
+    # this will later allow you to use per-VIRTUAL_HOST nginx configuration
     driver: local
     driver_opts:
       type: none
