@@ -1,0 +1,61 @@
+default:
+  image: docker:latest
+  tags:
+    - deploy
+
+variables:
+  DOCKER_BUILDKIT: 1
+
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_REF_NAME == "master"'
+      variables:
+        ENVIRONMENT: production
+        CONTAINER_NAME: $CI_PROJECT_PATH_SLUG-production
+        IMAGE_NAME: $CI_REGISTRY_IMAGE:production
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_REF_NAME == "staging"'
+      variables:
+        ENVIRONMENT: staging
+        CONTAINER_NAME: $CI_PROJECT_PATH_SLUG-staging
+        IMAGE_NAME: $CI_REGISTRY_IMAGE:staging
+
+stages:
+  - dependencies
+  - validate
+  - deploy
+
+.base:
+  environment: $ENVIRONMENT
+  before_script:
+    - cp $ENV_FILE .env
+    - docker info
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+
+deps:
+  stage: dependencies
+  extends: .base
+  script:
+    - docker build --target build-base -t $IMAGE_NAME .
+
+lint:
+  stage: validate
+  extends: .base
+  needs: ['deps']
+  script:
+    - docker run --rm $IMAGE_NAME pnpm run lint
+
+build:
+  stage: validate
+  extends: .base
+  needs: ['deps']
+  script:
+    - docker build --target build -t $IMAGE_NAME .
+    - docker push $IMAGE_NAME
+
+deploy:
+  stage: deploy
+  extends: .base
+  needs: ['build', 'lint']
+  script:
+    - IMAGE_NAME=$IMAGE_NAME CONTAINER_NAME=$CONTAINER_NAME
+      docker compose -f docker-compose.yml up -d --build
