@@ -13,10 +13,13 @@ services:
       GITLAB_HOME: /srv/gitlab
       GITLAB_OMNIBUS_CONFIG: |
         external_url 'https://gitlab.mydomain.com'
-        registry_external_url 'https://registry-gitlab.mydomain.com'
-        gitlab_rails['registry_enabled'] = true
-        gitlab_rails['registry_host'] = 'registry-gitlab.mydomain.com'
         gitlab_rails['gitlab_shell_ssh_port'] = 2224
+        gitlab_rails['registry_enabled'] = true
+        gitlab_rails['dependency_proxy_enabled'] = true
+        registry_external_url 'https://registry-gitlab.mydomain.com'
+        gitlab_rails['registry_host'] = 'registry-gitlab.mydomain.com'
+        letsencrypt['enable'] = false
+        nginx['redirect_http_to_https'] = true
         nginx['ssl_certificate'] = "/etc/gitlab/ssl/gitlab.mydomain.com/fullchain.pem"
         nginx['ssl_certificate_key'] = "/etc/gitlab/ssl/gitlab.mydomain.com/key.pem"
         registry_nginx['ssl_certificate'] = "/etc/gitlab/ssl/gitlab.mydomain.com/fullchain.pem"
@@ -24,11 +27,12 @@ services:
     ports:
       - '2224:22'
     volumes:
+      - certs:/etc/gitlab/ssl/:ro
       - /srv/gitlab/config:/etc/gitlab
       - /srv/gitlab/logs:/var/log/gitlab
       - /srv/gitlab/data:/var/opt/gitlab
+      - /srv/gitlab/registry:/srv/gitlab/registry
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - certs:/etc/gitlab/ssl/:ro
     shm_size: '256m'
     networks:
       - gitlab
